@@ -4,16 +4,15 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description': 'My Project',
-    'author': 'My Name',
-    'url': 'URL to get it at.',
-    'download_url': "Where to download it.',
+    'description': 'An implementation of the SigClust algorithm in Python',
+    'author': 'Arthur Tilley',
+    'url': 'https://github.com/aetilley/sigclust',
     'author_email': 'My email.',
     'version': '0.1',
     'install requires': ['nose'],
-    'packages': ['NAME'],
+    'packages': ['sigclust'],
     'scripts': [],
-    'name': 'projectname'
+    'name': 'sigclust'
 }
 
 setup(**config)
