@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  9 OCT 2015 08:54
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  15 OCT 2015 09:51
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -872,7 +872,7 @@ k\OML/cmm/m/it/10 X[] \OMS/cmsy/m/n/10 ^^@ []k
  []
 
 [3] [4]
-Overfull \hbox (1.19792pt too wide) in paragraph at lines 173--175
+Overfull \hbox (1.19792pt too wide) in paragraph at lines 168--170
 \OT1/cmr/m/n/10 Repeat the pre-vi-ous two steps $\OML/cmm/m/it/10 N[]$ \OT1/cmr
 /m/n/10 times for some large $\OML/cmm/m/it/10 N[]$\OT1/cmr/m/n/10 . Let $\OML/
 cmm/m/it/10 S \OT1/cmr/m/n/10 := \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 z[]\OMS/cms
@@ -880,7 +880,7 @@ y/m/n/10 g[]\OML/cmm/m/it/10 :$
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 173--175
+Underfull \hbox (badness 10000) in paragraph at lines 168--170
 
  []
 
@@ -918,7 +918,7 @@ mf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2013/texmf
 dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/local/texlive/2013/texmf-di
 st/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2013/texm
 f-dist/fonts/type1/public/rsfs/rsfs10.pfb>
-Output written on SigClust28Sept15.pdf (5 pages, 229266 bytes).
+Output written on SigClust28Sept15.pdf (5 pages, 229304 bytes).
 PDF statistics:
  107 PDF objects out of 1000 (max. 8388607)
  78 compressed objects within 1 object stream

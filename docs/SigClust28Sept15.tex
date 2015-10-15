@@ -120,17 +120,12 @@ Let $m, n \in \mathbb{Z}^{+}$ and $X\in \mathbb{R}^{m \times n}$.
 See above definition, and use $k=2$.  This value will not be needed until the final step $7$, so it can be computed at any point. 
 
 %Step 2
-\subsection{Step 2: Compute background noise level $\sigma_{N}^2$}  In order to apply some dimensionality reduction later, we assume some level $\epsilon \sim N(0, \sigma^{2}_{N} I_{n})$ background noise on the data. We are told to estimate the standard deviation $\sigma_{N}$ by
-$$\sigma_{N} = \frac{MAD(X)}{MAD(N(0,1))}$$
-Note that our definition for $MAD$ is for a uni-variate data set and not for a vector data set such as $rows(X)$ whose elements come from $\mathbb{R}^{n}$.  So in order for the above to make sense we need a multi-variate MAD.\\
-\indent The Mathematica implementation of $MAD$ defines its value on an array to be the row vector of the original MAD values of each of the columns of $X$.  This would make sense for us, but it would give us a scalar $\sigma_{N, i}$ for all $1\leq i \leq n$, and our goal is to get a single scalar value $\sigma_{N}$.\\
-\indent There seem to be two possible approaches.
-\begin{enumerate}
-\item
-Taking the column-wise MAD of each of the features, and then take either the mean or the median of the resulting row vector.
-\item
-Use some sort of multi-variate median (such as the \emph{geometric median}), and replace the ``absolute value'' $\lvert \cdot \vert$ by a vector norm on $\mathbb{R}^{n}$ such as the standard Euclidean $\mathscr{L}^{2}$ norm $\Vert \cdot \Vert_{2}$.
-\end{enumerate}
+\subsection{Step 2: Compute background noise level $\sigma_{N}^2$}  In order to apply some dimensionality reduction later, we assume some level $\epsilon \sim N(0, \sigma^{2}_{N} I_{n})$ background noise on the data. We estimate the standard deviation $\sigma_{N}$ by
+
+$$\sigma_{N} = \frac{MAD(X_{F})}{\Phi^{-1}(\frac{3}{4})}=\frac{MAD(X_{F})}{.6745} = (1.48257969) MAD(X_{F})$$
+
+where $X_{F}$ is a flattened (univariate) representation of the data $X$ and $\Phi^{-1}$ is the inverse CDF of the standard normal $N(0, 1)$.
+
 
 %Step 3
 \subsection{Step 3: PCA }
