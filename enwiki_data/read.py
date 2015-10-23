@@ -35,16 +35,19 @@ def read_data(f, features, rids=False):
 
 
 from editquality.feature_lists import enwiki
-import numpy
-import sigclust.sigclust
+import numpy as np
+from sigclust.sigclust import sigclust
 
 def get_mat(file_name, rids = False):
-    # Returns numpy array of input data.  Note that rows will include target labels and/or rev_ids if these are included in the original data.
+    """
+    Returns numpy array of input data.  Assumes last column is target labels.  If rids==True then assumes first collumn is rev_ids
+    """
+
     f = open(file_name)
 
     rows = list(read_data(f, enwiki.damaging, rids))
 
-    mat = numpy.array(rows).astype(float)
+    mat = np.array(rows).astype(float)
 
     result = mat[:, :-1]
 
@@ -68,3 +71,23 @@ array([ 0.218,  0.367,  0.656,  0.34 ,  0.014,  0.208,  0.526,  0.791,
 
 In [7]:
 """
+def sig_test(shape, iters = 20):
+    result = np.zeros(iters)
+    for i in np.arange(iters):
+        X = np.random.rand(shape[0], shape[1])
+        p = sigclust(X, verbose = False)[0]
+        result[i] = p
+    return result
+        
+
+"""Note:  
+Running sig_test((20, 5), 30) gives
+
+array([ 0.79 ,  0.705,  0.155,  0.53 ,  0.08 ,  0.235,  0.625,  0.03 ,
+        0.555,  0.765,  0.2  ,  0.23 ,  0.545,  0.685,  0.635,  0.815,
+        0.795,  0.815,  0.575,  0.07 ,  0.685,  0.3  ,  0.875,  0.385,
+        0.74 ,  0.955,  0.395,  0.195,  0.13 ,  0.69 ])
+
+Running sig_test(data.shape, 30) (where data is the get_mat("enwiki_data/data1.tsv"))
+
+runs to slowly, but the ci in the first iteration is .983370 and the simulated cis are all around .9847 suggesting a first p-value of 0.
