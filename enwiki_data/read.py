@@ -40,7 +40,9 @@ from sigclust.sigclust import sigclust
 
 def get_mat(file_name, rids = False):
     """
-    Returns numpy array of input data.  Assumes last column is target labels.  If rids==True then assumes first collumn is rev_ids
+    Reads data in file_name into a np. array.
+    When rids == False, assumes all columns of the file from file_name are feature data except for the last colume which is assumed to be labels.
+    When rids==True  assumes in addition that the first column is rev_ids and returns a *tuple* of that colum of ids together with the aforementioned np.array
     """
 
     f = open(file_name)
@@ -49,10 +51,14 @@ def get_mat(file_name, rids = False):
 
     mat = np.array(rows).astype(float)
 
+    #Last column is the label
     result = mat[:, :-1]
 
+    #if rids then expect first colun to be rev_ids
     if rids:
-        result = result[:, 1:]
+        rid_col = result[:, 0]
+        result = rid_col, result[:, 1:]
+        
     return result
 
 
@@ -61,8 +67,6 @@ def get_mat(file_name, rids = False):
  Note:  currently data_mat is about half zeros.
 
 When running sigclust 30 times on normally generated data of size (20, 5) with mc_iters = 1000 and floor = 0,  the resulting p values were
-
-
 
 Out[6]: 
 array([ 0.218,  0.367,  0.656,  0.34 ,  0.014,  0.208,  0.526,  0.791,
@@ -90,4 +94,6 @@ array([ 0.79 ,  0.705,  0.155,  0.53 ,  0.08 ,  0.235,  0.625,  0.03 ,
 
 Running sig_test(data.shape, 30) (where data is the get_mat("enwiki_data/data1.tsv"))
 
-runs to slowly, but the ci in the first iteration is .983370 and the simulated cis are all around .9847 suggesting a first p-value of 0.
+runs too slowly, but the ci in the first iteration is .983370 and the simulated cis are all around .9847 suggesting a first p-value of 0.
+
+"""

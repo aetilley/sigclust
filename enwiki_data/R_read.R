@@ -2,13 +2,16 @@ library(sigclust)
 print(sprintf("First the data in data2.tsv"))
 print(sprintf("Please wait..."))
 
+#set 1 for Soft thresholding, 3 for hard thresholding
+version <- 1
+
 data_2 = read.table("data2.tsv", stringsAsFactors = FALSE)
 features_2 = data_2[2:(ncol(data_2)-1)]
 features_2[features_2 == "True"] <- 1
 features_2[features_2 == "False"] <- 0
 
 data_mat = data.matrix(features_2)
-sig_obj = sigclust(data_mat, nsim = 100, icovest = 3)
+sig_obj = sigclust(data_mat, nsim = 100, icovest = version)
 sims = sig_obj@simcindex
 mean = mean(sims)
 sd = sd(sims)
@@ -27,7 +30,7 @@ tot_vals = length(data_mat)
 
 rand_mat_0 = matrix(rnorm(tot_vals, mean = 0, sd = 1), nrow = nrow, ncol=ncol)
 
-sig_obj_0 = sigclust(rand_mat_0, nsim = 100, icovest = 3)
+sig_obj_0 = sigclust(rand_mat_0, nsim = 100, icovest = version)
 sims0 = sig_obj_0@simcindex
 mean0 = mean(sims0)
 sd0 = sd(sims0)
@@ -51,7 +54,7 @@ rand_mat_1_2 = matrix(rnorm(nrow*ncol_1_2, mean = .5, sd = 1), nrow = nrow, ncol
 
 rand_mat_1 = rbind(rand_mat_1_1, rand_mat_1_2)
 
-sig_obj_1 = sigclust(rand_mat_1, nsim= 100, icovest = 3)
+sig_obj_1 = sigclust(rand_mat_1, nsim= 100, icovest = version)
 sims1 = sig_obj_1@simcindex
 mean1 = mean(sims1)
 sd1 = sd(sims1)

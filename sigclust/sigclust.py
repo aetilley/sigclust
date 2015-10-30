@@ -5,7 +5,7 @@ from sklearn.cluster import k_means
 
 
 
-def sigclust(X, mc_iters=200, floor=0, verbose=True):
+def sigclust(X, mc_iters=100, floor=0, verbose=True):
     """
     Returns p-value for k-means++ clustering of array X with k==2.
     X has shape (num_samples, num_features).
