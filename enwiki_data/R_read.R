@@ -2,8 +2,9 @@ library(sigclust)
 print(sprintf("First the data in data2.tsv"))
 print(sprintf("Please wait..."))
 
-#set 1 for Soft thresholding, 3 for hard thresholding
+#set 1 for Soft thresholding, 2 for no dimensionality reduction,  3 for hard thresholding
 version <- 1
+scale <- TRUE
 
 data_2 = read.table("data2.tsv", stringsAsFactors = FALSE)
 features_2 = data_2[2:(ncol(data_2)-1)]
@@ -11,6 +12,9 @@ features_2[features_2 == "True"] <- 1
 features_2[features_2 == "False"] <- 0
 
 data_mat = data.matrix(features_2)
+
+if (scale) {data_mat = scale(data_mat)}
+   
 sig_obj = sigclust(data_mat, nsim = 100, icovest = version)
 sims = sig_obj@simcindex
 mean = mean(sims)
