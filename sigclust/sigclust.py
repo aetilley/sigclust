@@ -1,11 +1,12 @@
 import numpy as np
 from sklearn.cluster import k_means
+from sklearn.preprocessing import scale
 
 
 
 
-
-def sigclust(X, mc_iters=100, floor=0, verbose=True):
+def sigclust(X, mc_iters=100, floor=0,
+             verbose=True, scale = False):
     """
     Returns p-value for k-means++ clustering of array X with k==2.
     X has shape (num_samples, num_features).
@@ -14,6 +15,8 @@ def sigclust(X, mc_iters=100, floor=0, verbose=True):
     floor is an optional minimum on simulation variances.
 
     """
+    if scale:
+        X = scale(X)
     num_samples, num_features = X.shape
     print("Number of samples: %d, Numer of features: %d" % (num_samples, num_features))
     

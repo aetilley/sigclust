@@ -42,7 +42,7 @@ def get_mat(file_name, rids = False):
     """
     Reads data in file_name into a np. array.
     When rids == False, assumes all columns of the file from file_name are feature data except for the last colume which is assumed to be labels.
-    When rids==True  assumes in addition that the first column is rev_ids and returns a *tuple* of that colum of ids together with the aforementioned np.array
+    When rids==True  assumes in addition that the first column is rev_ids and returns a *tuple* of that colum of ids together with the usual output np.array
     """
 
     f = open(file_name)
@@ -75,7 +75,7 @@ array([ 0.218,  0.367,  0.656,  0.34 ,  0.014,  0.208,  0.526,  0.791,
 
 In [7]:
 """
-def sig_test(shape, iters = 20):
+def sig_test1(shape, iters = 20):
     result = np.zeros(iters)
     for i in np.arange(iters):
         X = np.random.rand(shape[0], shape[1])
@@ -97,3 +97,40 @@ Running sig_test(data.shape, 30) (where data is the get_mat("enwiki_data/data1.t
 runs too slowly, but the ci in the first iteration is .983370 and the simulated cis are all around .9847 suggesting a first p-value of 0.
 
 """
+
+def RSC(file, rids=True):
+    rid_col, X = get_mat(file, rids = rids)
+    while(True):
+        p, clust = sigclust(X, verbose = False)
+        print("p-value: %f" % p)
+
+        s = sum(clust)
+        n_samps = X.shape[0]
+        print("The clusters have sizes %d, %d" %
+              (n_samps - s, s))
+        in0 = input("Remove all points in smallest cluster and re-run sigclust?  (Enter 'n' to terminate.):")
+        
+        if in0 is 'n':
+            break
+
+        
+        sec_small = s < (n_samps / 2)
+        print("Removing %s cluster (of size %d)." %
+              ("SECOND" if sec_small else "FIRST",
+               s if sec_small else n_samps - s))
+        
+               
+
+        f_clust = clust.astype(bool)
+        if sec_small:
+            to_remove = np.where(f_clust)[0]
+        else:
+            to_remove = np.where(~f_clust)[0]
+        print("Now removing samples with the following indices:")
+        print(to_remove)
+        print("These samples correspond to the following rev ids:")
+        rem_rids = rid_col[to_remove]
+        
+        print(rem_rids)
+    
+        X = np.delete(X, to_remove, axis = 0)
