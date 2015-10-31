@@ -98,10 +98,10 @@ runs too slowly, but the ci in the first iteration is .983370 and the simulated 
 
 """
 
-def RSC(file, rids=True):
+def RSC(file, rids=True, verbose = True, scale = False):
     rid_col, X = get_mat(file, rids = rids)
     while(True):
-        p, clust = sigclust(X, verbose = False)
+        p, clust = sigclust(X, verbose = verbose, scale = scale)
         print("p-value: %f" % p)
 
         s = sum(clust)

@@ -1,12 +1,12 @@
 import numpy as np
 from sklearn.cluster import k_means
-from sklearn.preprocessing import scale
+from sklearn.preprocessing import scale as pp_scale
 
 
 
 
 def sigclust(X, mc_iters=100, floor=0,
-             verbose=True, scale = False):
+             verbose=True, scale = True):
     """
     Returns p-value for k-means++ clustering of array X with k==2.
     X has shape (num_samples, num_features).
@@ -16,15 +16,18 @@ def sigclust(X, mc_iters=100, floor=0,
 
     """
     if scale:
-        X = scale(X)
+        print("Scaling and centering input matrix.")
+        X = pp_scale(X)
     num_samples, num_features = X.shape
-    print("Number of samples: %d, Numer of features: %d" % (num_samples, num_features))
+    if verbose:
+        print("Number of samples: %d, Numer of features: %d" % (num_samples, num_features))
     
     ci, labels = cluster_index_2(X)
     print("Cluster index of input data: %f" % ci)
 
     mad = MAD(X)
-    print("Median absolute deviation from the median of input data:  %f" % mad)
+    if verbose:
+        print("Median absolute deviation from the median of input data:  %f" % mad)
 
     bg_noise_var = (mad*normalizer)**2
     print("Estimated variance for background noise: %f" % bg_noise_var)
@@ -42,8 +45,9 @@ def sigclust(X, mc_iters=100, floor=0,
     rev_sorted_vals = eig_vals[rev_sorted_args]
 
     new_vars = np.maximum(rev_sorted_vals, floor_final * np.ones(num_features))
-
-    print("Variances for simulation are:", new_vars)
+    if verbose:
+        
+        print("Variances for simulation are:", new_vars)
 
     sim_cov_mat = np.diag(new_vars)
 
@@ -54,7 +58,7 @@ def sigclust(X, mc_iters=100, floor=0,
 
     #Counter for simulated cluster indices less than or equal to ci.
     lte = 0
-    
+    print("Simulating cluster indices.  Please wait...")    
     for i in np.arange(mc_iters):
     #Generate mc_iters datasets each of the same size as the original input.
         sim_data = np.random.multivariate_normal(np.zeros(num_features), sim_cov_mat, num_samples)
@@ -64,7 +68,8 @@ def sigclust(X, mc_iters=100, floor=0,
         """
 
         ci_sim = (cluster_index_2(sim_data))[0]
-        print("Cluster index of simulated data set number %d is %f" % (i, ci_sim))
+        if verbose:
+            print("Cluster index of simulated data set number %d is %f" % (i, ci_sim))
 
         if ci_sim <= ci:
             lte += 1
