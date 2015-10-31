@@ -52,14 +52,15 @@ def get_mat(file_name, rids = False):
     mat = np.array(rows).astype(float)
 
     #Last column is the label
+    labels = mat[:, -1]
     result = mat[:, :-1]
 
     #if rids then expect first colun to be rev_ids
     if rids:
         rid_col = result[:, 0]
-        result = rid_col, result[:, 1:]
-        
-    return result
+        return rid_col, result[:, 1:], labels
+    else:
+        return result, labels
 
 
 """
