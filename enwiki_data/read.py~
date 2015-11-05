@@ -2,7 +2,6 @@ from sys import argv
 
 def read_data(f, features, rids=False):
     """
-    Expects f to have tsv format.
     Reads a set of features and a label from a file one row at a time.
     rids says to expect the first column to be id numbers.
     """
@@ -39,7 +38,7 @@ from editquality.feature_lists import enwiki
 import numpy as np
 from sigclust.sigclust import sigclust
 
-def get_mat(file_name, rids = True):
+def get_mat(file_name, rids = False):
     """
     Reads data in file_name into a np. array.
     When rids == False, assumes all columns of the file from file_name are feature data except for the last colume which is assumed to be labels.

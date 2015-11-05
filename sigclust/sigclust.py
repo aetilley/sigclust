@@ -2,25 +2,24 @@ import numpy as np
 from sklearn.cluster import k_means
 from sklearn.preprocessing import scale as pp_scale
 
+"""Defs for sigclust, cluster_index2, MAD"""
 
 
-
-def sigclust(X, mc_iters=100, floor=0,
+def sigclust(X, mc_iters=100, floor=0, thresh = 2,
              verbose=True, scale = True):
     """
-    Returns p-value for k-means++ clustering of array X with k==2.
-    X has shape (num_samples, num_features).
-    mc_iters is an integer giving the number of iterations in 
-    the Monte Carlo step.
+    Returns tuple with first element the p-value for k-means++ clustering of array X with k==2.  The second element of the returned tuple is a (binary) array of length num_samples = X.shape[0] whose Nth value is the cluster assigned to the Nth sample (row) of X at the k-means step. (Eqivalently, sigclust(X)[1] == k_means(X,2)[1])
+    mc_iters is an integer giving the number of iterations in the Monte Carlo step.
     floor is an optional minimum on simulation variances.
-
+    scale = True  applies mean centering and variance normalization (sigma = 1) preprocessing to the input X.
+    verbose = True prints some additional statistics of inpute data.
     """
     if scale:
         print("Scaling and centering input matrix.")
         X = pp_scale(X)
     num_samples, num_features = X.shape
     if verbose:
-        print("Number of samples: %d, Numer of features: %d" % (num_samples, num_features))
+        print("Number of samples: %d, Number of features: %d" % (num_samples, num_features))
     
     ci, labels = cluster_index_2(X)
     print("Cluster index of input data: %f" % ci)
@@ -47,35 +46,44 @@ def sigclust(X, mc_iters=100, floor=0,
     new_vars = np.maximum(rev_sorted_vals, floor_final * np.ones(num_features))
     if verbose:
         
-        print("Variances for simulation are:", new_vars)
+        print("The %d variances for simulation \
+have mean %f and standard deviation %f." %
+        (X.shape[1],
+         np.mean(new_vars),
+         np.std(new_vars)))
 
     sim_cov_mat = np.diag(new_vars)
-
-    if verbose:
-        input("Press enter to begin simulation.")
     
     ##MONTE CARLO STEP
 
     #Counter for simulated cluster indices less than or equal to ci.
     lte = 0
-    print("Simulating cluster indices.  Please wait...")    
+    print("Simulating %d cluster indices. \
+Please wait..." %
+          mc_iters)
+    CIs = np.zeros(mc_iters)
     for i in np.arange(mc_iters):
     #Generate mc_iters datasets each of the same size as the original input.
         sim_data = np.random.multivariate_normal(np.zeros(num_features), sim_cov_mat, num_samples)
 
-        """
-        Shape of sim_data was (mc_iters, num_samples, num_features)
-        """
+        # Now sim_data.shape = X.shape
 
         ci_sim = (cluster_index_2(sim_data))[0]
-        if verbose:
-            print("Cluster index of simulated data set number %d is %f" % (i, ci_sim))
-
+        CIs[i] = ci_sim
         if ci_sim <= ci:
             lte += 1
     #P value
+    print("Simulation complete.")
+    print("The simulated cluster indices had mean %f \
+and standard deviation %f." %
+          (np.mean(CIs), np.std(CIs)))
+    
     p = lte / mc_iters
-        
+    print("In %d iterations there were \
+%d cluster indices <= the cluster index of \
+the input data." %
+          (mc_iters, lte))
+    print("p-value:  %f" % p)
     return p, labels
 
 
@@ -115,4 +123,60 @@ def MAD(X):
     return np.median(np.abs(X - np.median(X)))
 
 
-
+def recclust(X, threshold = .01, mc_iters = 100, verbose = True, prefix = "/", IDS = np.arange(0)):
+    
+    """
+    Recursively applies sigclust to until all remaining clusters have sigclust p-value below threshold.
+    Returns dictionary with entries having keys "prefix", "pval", "subclust0", "subclust1", and "ids"
+    "prefix" is a string representation for a path to the root cluster consisting of all samples in the input X.
+    "pval" is the p-valu of cluster 'prefix'
+    "subclust{0,1}" are dictionaries fo the same form as this, representing the two primary subclusters of the cluster 'prefix'.  Note that these may be None if pval greater than threshold.
+    "ids" is a numpy array of keys to use to record the cluster elements themselves.  Note that this may be None if pval is greater than threshold.
+    "tot" is the total number of samples in the cluster.
+    """
+    if IDS.shape[0] == 0 :
+        IDS = np.arange(X.shape[0])
+    assert IDS.shape[0] == X.shape[0], """Input data \
+    and tag list must have compatible dimensions \
+    (or tag list must be None).
+    """
+    
+    data = {"prefix" : prefix, "pval" : None,
+           "subclust0" : None, "subclust1" : None,
+            "ids" : None, "tot" : 1}
+    if X.shape[0] == 1:
+        data["ids"] = IDS
+        print("Cluster %s has exactly one element." %
+              prefix)
+    else:
+        
+        p, clust = sigclust(X, mc_iters = mc_iters,
+                            verbose = verbose)
+        print("The p value for subcluster id %s is %f" %
+              (prefix, p))
+        data["pval"] = p
+        
+        if p >= threshold:
+            data["ids"] = IDS
+        else:
+            pref0 = prefix + "0"
+            pref1 = prefix + "1"
+            print("Examining sub-clusters %s and %s" %
+                  (pref0, pref1))
+            data_0 = X[clust == 0, :]
+            data_1 = X[clust == 1, :]
+            print("Computing RecClust data for first cluster.\
+  Please wait...")
+            dict0 = recclust(data_0,
+                             prefix = prefix + "0",
+                             IDS = IDS[clust == 0])
+            print("Computing Recclust data for second cluster.\
+  Please wait...")            
+            dict1 = recclust(data_1,
+                             prefix = prefix + "1",
+                             IDS = IDS[clust == 1])
+            data["subclust0"] = dict0
+            data["subclust1"] = dict1
+            data["tot"] = dict0["tot"] + dict1["tot"]
+        
+    return data

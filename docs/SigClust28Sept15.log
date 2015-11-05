@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  15 OCT 2015 09:51
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  4 NOV 2015 12:11
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -892,7 +892,7 @@ Package logreq Info: Writing requests to 'SigClust28Sept15.run.xml'.
 Here is how much of TeX's memory you used:
  18142 strings out of 493315
  313409 string characters out of 6137904
- 503420 words of memory out of 5000000
+ 504420 words of memory out of 5000000
  21227 multiletter control sequences out of 15000+600000
  14615 words of font info for 62 fonts, out of 8000000 for 9000
  958 hyphenation exceptions out of 8191
@@ -918,7 +918,7 @@ mf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2013/texmf
 dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/local/texlive/2013/texmf-di
 st/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2013/texm
 f-dist/fonts/type1/public/rsfs/rsfs10.pfb>
-Output written on SigClust28Sept15.pdf (5 pages, 229304 bytes).
+Output written on SigClust28Sept15.pdf (5 pages, 229622 bytes).
 PDF statistics:
  107 PDF objects out of 1000 (max. 8388607)
  78 compressed objects within 1 object stream
