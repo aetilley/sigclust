@@ -1,0 +1,3 @@
+from enwikidata.read import get_mat
+
+rid_col, features, labels = get_mat("enwiki_data/data2.tsv")
