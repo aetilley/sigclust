@@ -19,17 +19,23 @@ def sigclust(X, mc_iters=100, floor=0, thresh = 2,
         X = pp_scale(X)
     num_samples, num_features = X.shape
     if verbose:
-        print("Number of samples: %d, Number of features: %d" % (num_samples, num_features))
+        print("""
+Number of samples: %d, 
+Number of features: %d""" %
+              (num_samples, num_features))
     
     ci, labels = cluster_index_2(X)
     print("Cluster index of input data: %f" % ci)
 
     mad = MAD(X)
     if verbose:
-        print("Median absolute deviation from the median of input data:  %f" % mad)
+        print("""Median absolute deviation 
+from the median of input data:  %f""" % mad)
+        
 
     bg_noise_var = (mad*normalizer)**2
-    print("Estimated variance for background noise: %f" % bg_noise_var)
+    print("""Estimated variance for 
+background noise: %f""" % bg_noise_var)
 
     floor_final = max(floor, bg_noise_var)
 
@@ -46,8 +52,9 @@ def sigclust(X, mc_iters=100, floor=0, thresh = 2,
     new_vars = np.maximum(rev_sorted_vals, floor_final * np.ones(num_features))
     if verbose:
         
-        print("The %d variances for simulation \
-have mean %f and standard deviation %f." %
+        print("""The %d variances for simulation have
+ mean: %f 
+standard deviation: %f.""" %
         (X.shape[1],
          np.mean(new_vars),
          np.std(new_vars)))
@@ -58,8 +65,8 @@ have mean %f and standard deviation %f." %
 
     #Counter for simulated cluster indices less than or equal to ci.
     lte = 0
-    print("Simulating %d cluster indices. \
-Please wait..." %
+    print("""Simulating %d cluster indices.
+Please wait...""" %
           mc_iters)
     CIs = np.zeros(mc_iters)
     for i in np.arange(mc_iters):
@@ -74,15 +81,16 @@ Please wait..." %
             lte += 1
     #P value
     print("Simulation complete.")
-    print("The simulated cluster indices had mean %f \
-and standard deviation %f." %
+    print("""The simulated cluster indices had
+mean: %f
+standard deviation: %f.""" %
           (np.mean(CIs), np.std(CIs)))
     
     p = lte / mc_iters
-    print("In %d iterations there were \
-%d cluster indices <= the cluster index of \
-the input data." %
-          (mc_iters, lte))
+    print("""In %d iterations there were 
+%d cluster indices <= the cluster index %f
+ of the input data.""" %
+          (mc_iters, lte, ci))
     print("p-value:  %f" % p)
     return p, labels
 
