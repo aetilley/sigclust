@@ -1,3 +1,4 @@
+from sys import exit
 import numpy as np
 from sklearn.cluster import k_means
 from sklearn.preprocessing import scale as pp_scale
@@ -5,7 +6,7 @@ from sklearn.preprocessing import scale as pp_scale
 """Defs for sigclust, cluster_index2, MAD"""
 
 
-def sigclust(X, mc_iters=100, thresh = 2,
+def sigclust(X, mc_iters=100, method = 2,
              verbose=True, scale = True):
     """
     Returns tuple with first element the p-value for k-means++ clustering of array X with k==2.  The second element of the returned tuple is a (binary) array of length num_samples = X.shape[0] whose Nth value is the cluster assigned to the Nth sample (row) of X at the k-means step. (Eqivalently, sigclust(X)[1] == k_means(X,2)[1])
@@ -37,13 +38,11 @@ from the median of input data:  %f""" % mad)
     print("""Estimated variance for 
 background noise: %f""" % bg_noise_var)
 
-    floor_final = max(floor, bg_noise_var)
-
     sample_cov_mat = np.cov(X.T)
 
     eig_vals, eig_vects = np.linalg.eig(sample_cov_mat)
 
-    sim_vars = comp_sim_vars(eig_vals, bg_noise_var, thresh )
+    sim_vars = comp_sim_vars(eig_vals, bg_noise_var, method)
     
 
             
@@ -189,21 +188,23 @@ def recclust(X, threshold = .01, mc_iters = 100, verbose = True, prefix = "/", I
 
 
 
-    def comp_sim_vars(eig_vals, noise, thresh):
+def comp_sim_vars(eig_vals, noise, method):
 
-        #First sort eig_vals
-        args = np.argsort(eig_vals)
-        rev_sorted_args = args[::-1]
-        rev_sorted_vals = eig_vals[rev_sorted_args]
-        
-        if thresh == 0:
-            print("Threshold parameter 0, ignoring background noise.")
-            return rev_sorted_vals
-        elif thresh == 1:
-            print("Threshold parameter 1, applying hard thresholding.")
-            return np.maximum(rev_sorted_vals,
-                              bg_noise_var * np.ones(num_features))
-        else:
-            assert thresh == 2, "Threshold parameter must be one of {0, 1, 2}."
-            print("Applying soft thresholding.")
-            
+    #First sort eig_vals
+    args = np.argsort(eig_vals)
+    rev_sorted_args = args[::-1]
+    rev_sorted_vals = eig_vals[rev_sorted_args]
+    assert method in {0, 1, 2}, "method parameter must be one of 0,1,2"
+    if method == 0:
+        print("""Ignoring background noise and using
+raw sample covariance estimates...""")
+        return rev_sorted_vals
+    elif method == 1:
+        print("Applying hard thresholding...")
+        return np.maximum(rev_sorted_vals,
+                          bg_noise_var * np.ones(num_features))
+    else:
+        print("Applying soft thresholding...")
+        print("""Soft-thresholding all but implimented.  Check again soon.
+        In the meantime try hard thresholding (method = 1).""")
+        exit()
