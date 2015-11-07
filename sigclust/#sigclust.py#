@@ -46,9 +46,6 @@ background noise: %f""" % bg_noise_var)
     sim_vars = comp_sim_vars(eig_vals, bg_noise_var, thresh )
     
 
-            
-        
-    
     if verbose:
         print("""The %d variances for simulation have
  mean: %f 
@@ -206,4 +203,6 @@ def recclust(X, threshold = .01, mc_iters = 100, verbose = True, prefix = "/", I
         else:
             assert thresh == 2, "Threshold parameter must be one of {0, 1, 2}."
             print("Applying soft thresholding.")
+
+            
             
