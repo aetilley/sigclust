@@ -9,20 +9,19 @@ from sklearn.preprocessing import scale as pp_scale
 def sigclust(X, mc_iters=100, method = 2,
              verbose=True, scale = True):
     """
-    Returns tuple with first element the p-value for k-means++ clustering of array X with k==2.  The second element of the returned tuple is a (binary) array of length num_samples = X.shape[0] whose Nth value is the cluster assigned to the Nth sample (row) of X at the k-means step. (Eqivalently, sigclust(X)[1] == k_means(X,2)[1])
+    Returns tuple with first element the p-value for k-means++ clustering of array X with k==2.  The second element of the returned tuple is a (binary) array of length num_samples = X.shape[0] whose Nth value is the cluster assigned to the Nth sample (row) of X at the k-means step. (Equivalently, sigclust(X)[1] == k_means(X,2)[1])
     mc_iters is an integer giving the number of iterations in the Monte Carlo step.
-    floor is an optional minimum on simulation variances.
+    method = 0 uses sample cov matrix eigenvalues directly for simulation.  method = 1 applies hard threasholding, m =  applies soft thresholding. 
     scale = True  applies mean centering and variance normalization (sigma = 1) preprocessing to the input X.
-    verbose = True prints some additional statistics of inpute data.
+    verbose = True prints some additional statistics of input data.
     """
     if scale:
         print("Scaling and centering input matrix.")
         X = pp_scale(X)
     num_samples, num_features = X.shape
     if verbose:
-        print("""
-Number of samples: %d, 
-Number of features: %d""" %
+        print("""Number of samples: %d, 
+        Number of features: %d""" %
               (num_samples, num_features))
     
     ci, labels = cluster_index_2(X)
@@ -188,7 +187,7 @@ def recclust(X, threshold = .01, mc_iters = 100, verbose = True, prefix = "/", I
 
 
 
-def comp_sim_vars(eig_vals, noise, method):
+def comp_sim_vars(eig_vals, bg_noise_var, method):
 
     #First sort eig_vals
     args = np.argsort(eig_vals)
@@ -205,6 +204,36 @@ raw sample covariance estimates...""")
                           bg_noise_var * np.ones(num_features))
     else:
         print("Applying soft thresholding...")
-        print("""Soft-thresholding all but implimented.  Check again soon.
-        In the meantime try hard thresholding (method = 1).""")
-        exit()
+        tau = comp_sim_tau(rev_sorted_vals, bg_noise_var)
+        sim_vars = rev_sorted_vals - tau
+        sim_vars[sim_vars < bg_noise_var] = bg_noise_var
+        return sim_vars
+
+
+def comp_sim_tau(rsrtd_vals, bg_noise_var):
+    """
+    Finds tau to preserve trace of sample cov matrix in the simulation cov matrix:
+sum_{i}(lambda_i) = sum_{i}{(lambda_i - tau - bg_noise_var)_{+} + bg_noise_var}
+"""
+    diffs = rsrtd_vals - bg_noise_var
+    expensive_diffs = np.where(diffs <= 0)[0]
+    first_nonpos_ind = expensive_diffs[0]
+    print("first_nonpos_ind: %d" % first_nonpos_ind)
+    expended = -diffs[first_nonpos_ind:].sum()
+
+    print(diffs[:first_nonpos_ind])
+    rev = diffs
+    possible_returns = np.sort(diffs[:first_nonpos_ind]).cumsum()[::-1]
+    tau_bonuses = np.arange(first_nonpos_ind) * diffs[:first_nonpos_ind]
+    deficits = expended - possible_returns - tau_bonuses
+    pos_defic = deficits > 0
+
+    if pos_defic.sum() == 0:
+        tau = expended / first_nonpos_ind
+    else:
+        ind = np.where(pos_defic)[0][0]
+        if ind == 0:
+            tau = diffs[0]
+        else:
+            tau = diffs[ind] + deficits[ind] / ind
+    return tau
