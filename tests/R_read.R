@@ -6,7 +6,7 @@ print(sprintf("Please wait..."))
 version <- 1
 scale <- TRUE
 
-data_2 = read.table("data2.tsv", stringsAsFactors = FALSE)
+data_2 = read.table("enwiki_data/data2.tsv", stringsAsFactors = FALSE)
 features_2 = data_2[2:(ncol(data_2)-1)]
 features_2[features_2 == "True"] <- 1
 features_2[features_2 == "False"] <- 0
