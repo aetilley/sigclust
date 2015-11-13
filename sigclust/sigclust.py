@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.cluster import k_means
 from sklearn.preprocessing import scale as pp_scale
 
-"""Defs for sigclust, cluster_index2, MAD"""
+"""Defs for sigclust, cluster_index2, MAD, recclust, comp_sim_var, comp_sim_tau"""
 
 
 def sigclust(X, mc_iters=100, method = 2,
@@ -43,14 +43,11 @@ background noise: %f""" % bg_noise_var)
 
     sim_vars = comp_sim_vars(eig_vals, bg_noise_var, method)
     
-
-            
-        
-    
     if verbose:
-        print("""The %d variances for simulation have
- mean: %f 
-standard deviation: %f.""" %
+        print("""
+        The %d variances for simulation have
+        mean: %f 
+        standard deviation: %f.""" %
         (X.shape[1],
          np.mean(sim_vars),
          np.std(sim_vars)))
@@ -66,11 +63,10 @@ Please wait...""" %
           mc_iters)
     CIs = np.zeros(mc_iters)
     for i in np.arange(mc_iters):
-    #Generate mc_iters datasets each of the same size as the original input.
+    #Generate mc_iters datasets
+        #each of the same size as
+        #the original input.
         sim_data = np.random.multivariate_normal(np.zeros(num_features), sim_cov_mat, num_samples)
-
-        # Now sim_data.shape = X.shape
-
         ci_sim = (cluster_index_2(sim_data))[0]
         CIs[i] = ci_sim
         if ci_sim <= ci:
@@ -90,15 +86,8 @@ standard deviation: %f.""" %
     print("p-value:  %f" % p)
     return p, labels
 
-
-def cluster_index_2(X):
-
-    """
-    Returns the pair consisting of the 2-means cluster index
-    for X and the corresponding labels
-    """
-    
-    global_mean = X.mean(axis=0)
+def cluster_index_2(X):    
+    global_mean = np.mean(X, axis=0)
 
     sum_squared_distances = (((X - global_mean)**2).sum(axis = 1)).sum()
     #Sum of squared distances of each sample from the global mean
@@ -108,9 +97,8 @@ def cluster_index_2(X):
     ci = inertia / sum_squared_distances
 
     return ci , labels
-    
 
-
+###
 normalizer = 1.48257969
 """
 Equal to 1/(Phi^{-1}(3/4)) where Phi is the CDF
@@ -120,14 +108,16 @@ of the standard normal distribution N(0, 1)
 
 def MAD(X):
     """
-    Returns the median absolute deviation from the median
-    for a data array X.  If X has dimension greater than 1, 
-    returns MAD of flattened array.
+    Returns the median absolute deviation
+    from the median for (a flattened version of)
+    the input data array X.  
     """
     return np.median(np.abs(X - np.median(X)))
 
 
-def recclust(X, threshold = .01, mc_iters = 100, verbose = True, prefix = "/", IDS = np.arange(0)):
+def recclust(X, threshold = .01,
+             mc_iters = 100, verbose = True,
+             prefix = "/", IDS = np.arange(0)):
     
     """
     Recursively applies sigclust to until all remaining clusters have sigclust p-value below threshold.
@@ -140,23 +130,26 @@ def recclust(X, threshold = .01, mc_iters = 100, verbose = True, prefix = "/", I
     """
     if IDS.shape[0] == 0 :
         IDS = np.arange(X.shape[0])
-    assert IDS.shape[0] == X.shape[0], """Input data \
-    and tag list must have compatible dimensions \
-    (or tag list must be None).
+    assert IDS.shape[0] == X.shape[0], """Input data and tag list must have
+    compatible dimensions (or tag list
+    must be None).
     """
     
     data = {"prefix" : prefix, "pval" : None,
-           "subclust0" : None, "subclust1" : None,
+           "subclust0" : None,
+            "subclust1" : None,
             "ids" : None, "tot" : 1}
+    
     if X.shape[0] == 1:
         data["ids"] = IDS
-        print("Cluster %s has exactly one element." %
-              prefix)
+        print("""Cluster %s has exactly
+        one element.""" % prefix)
     else:
-        
-        p, clust = sigclust(X, mc_iters = mc_iters,
+        p, clust = sigclust(X,
+                            mc_iters = mc_iters,
                             verbose = verbose)
-        print("The p value for subcluster id %s is %f" %
+        print("""The p value for
+        subcluster id %s is %f""" %
               (prefix, p))
         data["pval"] = p
         
@@ -165,17 +158,19 @@ def recclust(X, threshold = .01, mc_iters = 100, verbose = True, prefix = "/", I
         else:
             pref0 = prefix + "0"
             pref1 = prefix + "1"
-            print("Examining sub-clusters %s and %s" %
-                  (pref0, pref1))
+            print("""Examining sub-clusters
+            %s and %s""" % (pref0, pref1))
             data_0 = X[clust == 0, :]
             data_1 = X[clust == 1, :]
-            print("Computing RecClust data for first cluster.\
-  Please wait...")
+            print("""Computing RecClust data
+            for first cluster.
+            Please wait...""")
             dict0 = recclust(data_0,
                              prefix = prefix + "0",
                              IDS = IDS[clust == 0])
-            print("Computing Recclust data for second cluster.\
-  Please wait...")            
+            print("""Computing Recclust data
+            for second cluster.
+            Please wait...""")            
             dict1 = recclust(data_1,
                              prefix = prefix + "1",
                              IDS = IDS[clust == 1])
@@ -184,8 +179,6 @@ def recclust(X, threshold = .01, mc_iters = 100, verbose = True, prefix = "/", I
             data["tot"] = dict0["tot"] + dict1["tot"]
         
     return data
-
-
 
 def comp_sim_vars(eig_vals, bg_noise_var, method):
 
@@ -218,11 +211,7 @@ sum_{i}(lambda_i) = sum_{i}{(lambda_i - tau - bg_noise_var)_{+} + bg_noise_var}
     diffs = rsrtd_vals - bg_noise_var
     expensive_diffs = np.where(diffs <= 0)[0]
     first_nonpos_ind = expensive_diffs[0]
-    print("first_nonpos_ind: %d" % first_nonpos_ind)
     expended = -diffs[first_nonpos_ind:].sum()
-
-    print(diffs[:first_nonpos_ind])
-    rev = diffs
     possible_returns = np.sort(diffs[:first_nonpos_ind]).cumsum()[::-1]
     tau_bonuses = np.arange(first_nonpos_ind) * diffs[:first_nonpos_ind]
     deficits = expended - possible_returns - tau_bonuses
