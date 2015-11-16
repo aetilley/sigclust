@@ -247,6 +247,7 @@ def opt_tau(L, U, vals, sig2, ngrains= 100):
     """
 Finds tau between L and U that optimizes TCI
 """
+    
     d_tau = (U - L)/ngrains
     rel_sizes = np.zeros(ngrains)
     for i in np.arange(ngrains):
