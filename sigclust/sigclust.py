@@ -22,7 +22,7 @@ def sigclust(X, mc_iters=100, method=2, verbose=True, scale=True,
 
     mc_iters is an integer giving the number of iterations in the Monte Carlo step.
     method = 0 uses sample cov matrix eigenvalues directly for simulation.
-    method = 1 applies hard threasholding, m =  applies soft thresholding.
+    method = 1 applies hard threasholding, method = 2  applies soft thresholding.
     scale = True  applies mean centering and variance normalization
         (sigma = 1) preprocessing to the input X.
     verbose = True prints some additional statistics of input data.
