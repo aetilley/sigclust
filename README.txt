@@ -12,4 +12,4 @@ The original version of this code sprung out of interest in clustering Wikipedia
 
 [1]  Yufeng Liu, David Neil Hayes, Andrew Nobel and J. S. Marron, Statistical Significance of Clustering for High-Dimension, Low-Sample Size Data, Journal of the American Statistical Association, Vol. 103, No. 483 (Sep., 2008), pp. 1281-1293
 
-[2] http://arxiv.org/abs/1305.5879v2
+[2] Hanwen Huang, Yufeng Liu, Ming Yuan, J.S. Marron, Statistical Significance of Clustering using Soft Thresholding, Journal of Computational and Graphical Statistics, 2014 (DOI:10.1080/10618600.2014.948179)
