@@ -3,6 +3,7 @@ Defs for sigclust, cluster_index2, MAD, recclust, comp_sim_var,
     comp_sim_tau.
 """
 
+from sys import exit
 import numpy as np
 from sklearn.cluster import k_means
 from sklearn.preprocessing import scale as pp_scale
@@ -19,18 +20,14 @@ def sigclust(X, mc_iters=100, method=2, verbose=True, scale=True,
         the Nth sample (row) of X at the k-means step.
         Equivalently, sigclust(X)[1] == k_means(X,2)[1]
 
-    mc_iters is an integer giving the number of iterations in
-        the Monte Carlo step.
-
+    mc_iters is an integer giving the number of iterations in the Monte Carlo step.
     method = 0 uses sample cov matrix eigenvalues directly for simulation.
-    method = 1 applies hard threasholding.
-    method = 2 applies soft thresholding.
-
+    method = 1 applies hard threasholding, method = 2  applies soft thresholding.
     scale = True  applies mean centering and variance normalization
         (sigma = 1) preprocessing to the input X.
     verbose = True prints some additional statistics of input data.
 
-    When method is 2 (solf-thresholding), p_op indicates to perform some
+    When method  is 2 (solf-thresholding), p_op indicates to perform some
         addiitonal optimization on the parameter tau.  If p_op is False,
         the parameter tau is set to that which best preserves the trace of
         the sample covariance matrix (this is just the output of comp_sim_tau)
@@ -38,7 +35,7 @@ def sigclust(X, mc_iters=100, method=2, verbose=True, scale=True,
     sum_{i}lambda_i == sum_{i}{lambda_i - tau - sigma^2}_{+} + sigma^2).
     If p_op is True, tau is set to some value between 0 and the output
         of comp_sim_tau which maximizes the relative size of the largest
-        simulation variance. ngrains is then number of values checked in
+        simulation variance.  ngrains is then number of values checked in
         this optimization.
     """
     if scale:
@@ -70,8 +67,8 @@ def sigclust(X, mc_iters=100, method=2, verbose=True, scale=True,
 
     if verbose:
         print("\nThe %d variances for simulation have\nmean: %f\n"
-              "standard deviation: %f."
-              % (X.shape[1], np.mean(sim_vars), np.std(sim_vars)))
+              "standard deviation: %f." % (X.shape[1], np.mean(sim_vars),
+              np.std(sim_vars)))
 
     sim_cov_mat = np.diag(sim_vars)
 
@@ -87,8 +84,7 @@ Please wait...""" %
         # Generate mc_iters datasets
         # each of the same size as
         # the original input.
-        sim_data = np.random.multivariate_normal(
-            np.zeros(num_features), sim_cov_mat, num_samples)
+        sim_data = np.random.multivariate_normal(np.zeros(num_features), sim_cov_mat, num_samples)
         ci_sim = (cluster_index_2(sim_data))[0]
         CIs[i] = ci_sim
         if ci_sim <= ci:
@@ -139,21 +135,17 @@ def MAD(X):
 def recclust(X, threshold=.01,
              mc_iters=100, verbose=True,
              prefix="/", IDS=np.arange(0)):
+
     """
-    Recursively apply sigclust to until all remaining clusters have sigclust
-        p-value below threshold.
+    Recursively applies sigclust to until all remaining clusters have sigclust p-value below threshold.
 
-    Returns dictionary with entries having keys "prefix", "pval", "subclust0",
-        "subclust1", and "ids".
-
-    "prefix" is a string representation for a path to the root cluster
-        consisting of all samples in the input X.
+    Returns dictionary with entries having keys "prefix", "pval", "subclust0", "subclust1", and "ids"
+    "prefix" is a string representation for a path to the root cluster consisting of all samples in the input X.
     "pval" is the p-value of cluster 'prefix'
     "subclust{0,1}" are dictionaries fo the same form as this,
         representing the two primary subclusters of the cluster 'prefix'.
         Note that these may be None if pval greater than threshold.
-    "ids" is a numpy array of keys to use to record the cluster elements
-        themselves.
+    "ids" is a numpy array of keys to use to record the cluster elements themselves.
         Note that this may be None if pval is greater than threshold.
     "tot" is the total number of samples in the cluster.
     """
@@ -210,8 +202,7 @@ def recclust(X, threshold=.01,
 
 def comp_sim_vars(eig_vals, bg_noise_var, method, p_op, ngrains):
     """
-    Compute variances for simlulation given sample variances,
-        bacground noise variance.
+    Compute variances for simlulation given sample variances, bacground noise varance.
 
     method in {0, 1, 2}  determines raw, hard, or soft thresholding methods.
     When method  is 2 (solf-thresholding), p_op indicates to perform some
@@ -248,8 +239,7 @@ def comp_sim_vars(eig_vals, bg_noise_var, method, p_op, ngrains):
 
 def comp_sim_tau(rsrtd_vals, bg_noise_var, p_op, ngrains):
     """
-    Find tau to preserve trace of sample cov matrix in the simulation
-        cov matrix.
+    Find tau to preserve trace of sample cov matrix in the simulation cov matrix.
 
     sum_{i}(lambda_i) = sum_{i}{(lambda_i - tau - bg_noise_var)_{+} + bg_noise_var}
     """
