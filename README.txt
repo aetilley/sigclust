@@ -8,7 +8,7 @@ See /docs for papers giving a formal description of the SigClust algorithm and f
 
 /sigclust contains the module sigclust.py in which are defined not only the main function sigclust and all dependent functions (MAD, cluster_index_2, comp_sim_var, comp_sim_tau) but also a program recclust which recursively applies sigclust to a set of data points and then to all sub-clusters, sub-sub-clusters, etc., until all further clusterings would correspond to a p-value below a certain user-defined cutoff. 
 
-The original version of this code sprung out of interest in clustering Wikipedia article revisions while funded by and Individual Engagement Grant from the Wikimedia Foundation.  
+The original version of this code sprung out of interest in clustering Wikipedia article revisions while funded by an Individual Engagement Grant from the Wikimedia Foundation.  
 
 [1]  Yufeng Liu, David Neil Hayes, Andrew Nobel and J. S. Marron, Statistical Significance of Clustering for High-Dimension, Low-Sample Size Data, Journal of the American Statistical Association, Vol. 103, No. 483 (Sep., 2008), pp. 1281-1293
 
