@@ -50,10 +50,10 @@ def get_mat(file_name, rids=True):
     Read data in file_name into a np. array.
 
     When rids == False, assumes all columns of the file from file_name are
-        feature data except for the last colume which is assumed to be labels.
-    When rids==True  assumes in addition that the first column is rev_ids
-        and returns a *tuple* of that colum of ids together with the usual
-        output np.array
+        feature values except for the last column, which is assumed to contain
+        labels.  Returns two element tuple (values, labels).
+    When rids == True, assumes in addition that the first column is rev_ids
+        and returns a three element tuple (ids, values, labels).
     """
 
     f = open(file_name)
@@ -66,7 +66,7 @@ def get_mat(file_name, rids=True):
     labels = mat[:, -1]
     result = mat[:, :-1]
 
-    # If rids then expect first colun to be rev_ids
+    # If rids then expect first column to be rev_ids
     if rids:
         rid_col = result[:, 0]
         return rid_col, result[:, 1:], labels
