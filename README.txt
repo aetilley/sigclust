@@ -1,4 +1,4 @@
-This package contains a Python implimentation of the SigClust algorithm originally proposed in [1] and whose soft-thresholding variant is given in [2].
+This package contains a Python implementation of the SigClust algorithm originally proposed in [1] and whose soft-thresholding variant is given in [2].
 
 See /docs for papers giving a formal description of the SigClust algorithm and for the official R documentation on the R package sigclust.
 
