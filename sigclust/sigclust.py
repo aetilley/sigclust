@@ -144,9 +144,8 @@ def comp_sim_vars(eig_vals, bg_noise_var, method, p_op, ngrains):
         simulation variance.
     """
 
-    args = np.argsort(eig_vals)
-    rev_sorted_args = args[::-1]
-    rev_sorted_vals = eig_vals[rev_sorted_args]
+    rev_sorted_vals = np.array(sorted(eig_vals, reverse = True))  #change1
+
     assert method in {0, 1, 2}, "method parameter must be one of 0,1,2"
     if method == 0:
         print("Ignoring background noise and using\n"
@@ -155,13 +154,13 @@ def comp_sim_vars(eig_vals, bg_noise_var, method, p_op, ngrains):
     elif method == 1:
         print("Applying hard thresholding...")
         return np.maximum(rev_sorted_vals,
-                          bg_noise_var * np.ones(num_features))
+                          bg_noise_var * np.ones(len(eig_vals)))
     else:
         print("Applying soft thresholding...")
         tau = comp_sim_tau(rev_sorted_vals, bg_noise_var, p_op, ngrains)
         sim_vars = rev_sorted_vals - tau
-        sim_vars[sim_vars < bg_noise_var] = bg_noise_var
-        return sim_vars
+        return np.maximum(sim_vars,
+                          bg_noise_var * np.ones(len(eig_vals))) #change2
 
 
 def comp_sim_tau(rsrtd_vals, bg_noise_var, p_op, ngrains):
@@ -172,8 +171,7 @@ def comp_sim_tau(rsrtd_vals, bg_noise_var, p_op, ngrains):
     sum_{i}(lambda_i) = sum_{i}{(lambda_i - tau - bg_noise_var)_{+} + bg_noise_var}
     """
     diffs = rsrtd_vals - bg_noise_var
-    expensive_diffs = np.where(diffs <= 0)[0]
-    first_nonpos_ind = expensive_diffs[0]
+    first_nonpos_ind = len(diffs) - len(diffs[diffs <=0]) #change3
     expended = -diffs[first_nonpos_ind:].sum()
     possible_returns = np.sort(diffs[:first_nonpos_ind]).cumsum()[::-1]
     tau_bonuses = np.arange(first_nonpos_ind) * diffs[:first_nonpos_ind]
